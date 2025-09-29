@@ -1,0 +1,30 @@
+<html>
+<head>
+        <title>Sample app</title>
+        <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+	<h1>Router: {{ ip }}</h2>
+	<a href="{{ url_for('main') }}"> BACK </a>
+	<table border="1" cellpadding="5" cellspacing="0" >
+		<tr> 
+			<th>Timestamp</th>
+			<th>Interface</th>
+			<th>IP Address</th>
+			<th>Status</th>
+			<th>Protocol</th>
+		</tr>
+		{% for record in data %}
+			{% for interfaces in record.interfaces %}
+			<tr>
+				<td> {{ record.timestamp }} </td>
+				<td> {{ interfaces.interface }} </td>
+				<td> {{ interfaces.ip_address }} </td>
+				<td> {{ interfaces.status }} </td>
+				<td> {{ interfaces.proto }} </td>
+			</tr>
+			{% endfor %}
+		{% endfor %}
+	</table>
+</body>
+</html>
