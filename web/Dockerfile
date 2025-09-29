@@ -1,5 +1,5 @@
 FROM python:3.10-slim
-WORKDIR /home/ubuntu/Desktop/ipa2025-msapp/web
+WORKDIR /ipa2025-project/web
 COPY requirements.txt .
 COPY  ./static ./static/
 COPY  ./templates ./templates/

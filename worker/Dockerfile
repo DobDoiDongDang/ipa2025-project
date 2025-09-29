@@ -1,5 +1,5 @@
 FROM python:3.10-slim
-WORKDIR /home/ubuntu/Desktop/ipa2025-msapp/worker
+WORKDIR /ipa2025-project/worker
 COPY requirements.txt .
 COPY  ./worker.py .
 COPY  ./ssh_router.py .

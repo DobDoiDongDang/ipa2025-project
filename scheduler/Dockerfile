@@ -1,5 +1,5 @@
 FROM python:3.10-slim
-WORKDIR /home/ubuntu/Desktop/ipa2025-msapp/scheduler
+WORKDIR /ipa2025-project/scheduler
 COPY requirements.txt .
 COPY  ./producer.py .
 COPY  ./scheduler.py .
