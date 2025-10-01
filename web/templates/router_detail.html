@@ -1,30 +1,141 @@
-<html>
+<!DOCTYPE html>
+<html lang="th">
 <head>
-        <title>Sample app</title>
-        <link rel="stylesheet" href="/static/style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Router: {{ ip }}</title>
+    <!-- โหลด Tailwind CSS สำหรับ Utility Class -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- เชื่อมโยงไปยังไฟล์ Custom Stylesheet -->
+    <link rel="stylesheet" href="/static/router_details.css" /> 
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-	<h1>Router: {{ ip }}</h2>
-	<a href="{{ url_for('main') }}"> BACK </a>
-	<table border="1" cellpadding="5" cellspacing="0" >
-		<tr> 
-			<th>Timestamp</th>
-			<th>Interface</th>
-			<th>IP Address</th>
-			<th>Status</th>
-			<th>Protocol</th>
-		</tr>
-		{% for record in data %}
-			{% for interfaces in record.interfaces %}
-			<tr>
-				<td> {{ record.timestamp }} </td>
-				<td> {{ interfaces.interface }} </td>
-				<td> {{ interfaces.ip_address }} </td>
-				<td> {{ interfaces.status }} </td>
-				<td> {{ interfaces.proto }} </td>
-			</tr>
-			{% endfor %}
-		{% endfor %}
-	</table>
+    <!-- CONTAINER FOR TWO-COLUMN LAYOUT -->
+    <div class="main-layout"> 
+        
+        <!-- START: LEFT SIDEBAR (รายการ Router ทั้งหมด) -->
+        <aside class="sidebar">
+            <header>
+                <h2>Router<br>Dashboard</h2>
+            </header>
+            <ul>
+                <!-- วนซ้ำแสดงรายการ router ทั้งหมด (สมมติว่า data เป็น List ของ Router Objects ที่มี property ชื่อ ip) -->
+                {% for router in router_list %}
+                    <li {% if router.ip == ip %}class="active-router"{% endif %}>
+                        <!-- ต้องมีการกำหนด url_for สำหรับ router_details ใน Flask/Jinja -->
+                        <a href="{{ url_for('router_details', ip=router.ip) }}">
+                            {{ router.ip }} 
+                            {% if router.ip == ip %} <span class="text-sm font-normal">(กำลังดู)</span> {% endif %}
+                        </a>
+                    </li>
+                {% endfor %}
+                {% if not data %}
+                    <li class="empty-message">ยังไม่มี Router ในรายการ</li>
+                {% endif %}
+            </ul>
+            <a href="{{ url_for('main') }}" class="back-to-main-button">
+                &larr; กลับหน้าหลัก
+            </a>
+        </aside>
+        <!-- END: LEFT SIDEBAR -->
+
+        <!-- START: MAIN CONTENT AREA -->
+        <main class="main-content">
+            <div class="p-6"> 
+                <!-- ส่วนหัวข้อ -->
+                <div class="header-section flex justify-between items-center pb-4 mb-8 border-b-4 border-teal-400">
+                    <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">รายละเอียด Router: <span class="text-teal-500">{{ ip }}</span></h1>
+                </div>
+
+                <!-- ฟอร์มสำหรับส่งข้อมูลการแก้ไข -->
+                    <div class="table-wrapper shadow-xl rounded-xl overflow-hidden">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Interface</th>
+                                    <th>IP Address</th>
+                                    <th>Subnet Mask</th>
+                                    <th>MAC Address</th>
+                                    <th>Status</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in data %}
+                                    {% for interfaces in record.interfaces %}
+				    <form method="POST" action="/config/{{ ip }}">
+                                        <tr class="hover:bg-cyan-50 transition duration-150">
+                                            <td class="text-sm text-gray-500">{{ record.timestamp }}</td>
+                                            <td class="font-medium text-gray-700">
+                                                <!-- Hidden field สำหรับระบุ Interface ID - แก้ไขเป็น loop.parent.index0 และ loop.index0 -->
+						<input type="hidden" name="interface {{ interfaces.index }}"
+                                                    value="{{ interfaces.interface }}">
+                                                {{ interfaces.interface }} 
+                                            </td>
+
+                                            <!-- IP Address (แก้ไขได้ตามเงื่อนไข: เป็น Text Box) -->
+                                            <td>
+                                                {% if interfaces.ip_address == ip %}
+                                                    <!-- IP หลัก: อ่านอย่างเดียว -->
+                                                    <span class="readonly-cell">{{ interfaces.ip_address }}</span>
+						    <input type="hidden" name="ip {{ interfaces.index }}"
+                                                        value="{{ interfaces.ip_address }}">
+                                                {% else %}
+                                                    <!-- IP อื่น: แก้ไขได้ - แก้ไขเป็น loop.parent.index0 และ loop.index0 -->
+						    <input type="text" name="ip {{ interfaces.index }}"
+                                                        value="{{ interfaces.ip_address }}"
+                                                        required
+                                                        class="editable-input">
+                                                {% endif %}
+                                            </td>
+
+                                            <!-- Subnet Mask (แก้ไขได้: เป็น Text Box) - แก้ไขเป็น loop.parent.index0 และ loop.index0 -->
+                                            <td>
+						    <input type="text" name="subnet {{ interfaces.index }}"
+                                                    value="{{ interfaces.subnet if interfaces.subnet else '' }}"
+                                                    required
+                                                    class="editable-input">
+                                            </td>
+
+                                            <!-- MAC Address (แสดงผลอย่างเดียว) -->
+                                            <td class="text-sm text-gray-600 font-mono">
+                                                {{ interfaces.mac_address }}
+                                            </td>
+
+                                            <!-- Status Dropdown (เหลือแค่ UP/DOWN) - แก้ไขเป็น loop.parent.index0 และ loop.index0 -->
+                                            <td>
+						    <select class="editable-select" name="status {{ interfaces.index }}">
+                                                    <option value="UP" {% if interfaces.status == "UP" %}selected{% endif %}>UP</option>
+                                                    <option value="DOWN" {% if interfaces.status == "DOWN" %}selected{% endif %}>DOWN</option>
+                                                </select>
+                                            </td>
+
+                                            <!-- Description (แก้ไขได้: เป็น Text Box) - แก้ไขเป็น loop.parent.index0 และ loop.index0 -->
+                                            <td>
+						    <input type="text" name="description {{ interfaces.index }}"
+                                                    value="{{ interfaces.description if interfaces.description else '' }}"
+                                                    class="editable-input text-xs" 
+                                                    placeholder="เพิ่มคำอธิบาย">
+                                            </td>
+                                            
+                                        </tr>
+                                    {% endfor %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- ปุ่มบันทึก -->
+                    <button type="submit" class="save-button mx-auto mt-8">
+                        บันทึกการเปลี่ยนแปลง
+                    </button>
+                </form>
+
+            </div>
+        </main>
+        <!-- END: MAIN CONTENT AREA -->
+    </div>
 </body>
 </html>
+

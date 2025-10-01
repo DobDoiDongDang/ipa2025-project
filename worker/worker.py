@@ -2,7 +2,7 @@ import pika
 import json
 import os
 import time
-from ssh_router import get_int_data
+from get_router_data import get_int_data
 from save_data import save_interface
 
 RABBITMQ_HOST = os.environ.get("RABBITMQ_HOST")

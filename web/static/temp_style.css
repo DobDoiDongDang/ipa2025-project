@@ -1,0 +1,48 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: flex; /* This is the magic for the two-column layout */
+    height: 100vh; /* Make the container fill the full height of the viewport */
+}
+
+.sidebar {
+    width: 250px; /* Adjust as needed */
+    background-color: #f4f4f4;
+    padding: 20px;
+    border-right: 1px solid #ccc;
+    overflow-y: auto; /* Adds a scrollbar if the list is long */
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar li a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: #333;
+    border-bottom: 1px solid #eee;
+}
+
+.sidebar li a:hover {
+    background-color: #ddd;
+}
+
+.main-content {
+    flex-grow: 1; /* This makes the main content area take up the remaining space */
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.add-form {
+    margin-top: 20px;
+    border-top: 1px solid #ccc;
+    padding-top: 20px;
+}

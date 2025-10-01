@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Router Manager</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Routers List</h2>
+            <ul>
+                {% for router in data %}
+                <li>
+                    <a href="{{ url_for('router_details', ip=router.ip) }}">{{ router.ip }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <div class="main-content">
+                <h1>Router Management Dashboard</h1>
+                <p>Select a router from the sidebar to view its details.</p>
+	    	{% for router_details in data %}
+                	<p><strong>IP:</strong> {{ router_details.ip }}</p>
+                	<p><strong>Username:</strong> {{ router_details.username }}</p>
+                	<form method="GET" action="{{ url_for('router_details', ip=router_details.ip) }}" style="display:inline">
+				<button type="summit">Config Router</button>
+			</form>
+                	<form method="POST" action="{{ url_for('delete_router', idx=router_details._id) }}" style="display:inline">
+                    		<button type="submit">Delete Router</button>
+                	</form>
+		{% endfor %}
+                <div class="add-form">
+                    <h2>Add New Router</h2>
+                    <form method="POST" action="/add">
+                        IP :<input name="ip" placeholder="IP" required />
+                        Username :<input name="username" placeholder="Username" required />
+                        Password :<input name="password" placeholder="Password" required />
+                        <button type="submit"> Add Router </button>
+                    </form>
+                </div>
+        </div>
+    </div>
+</body>
+</html>

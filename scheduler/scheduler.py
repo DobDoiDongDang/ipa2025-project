@@ -19,7 +19,7 @@ def scheduler():
         try:
             for data in get_router_info():
                 body_bytes = json_util.dumps(data).encode("utf-8")
-                produce(os.environ.get("RABBITMQ_HOST"), body_bytes)
+                produce("localhost", body_bytes)
         except Exception as e:
             print(e)
             time.sleep(3)

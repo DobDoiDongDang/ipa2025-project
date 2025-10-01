@@ -14,6 +14,7 @@ client = MongoClient(mongo_url)
 mydb = client[mongo_db]
 myint = mydb["interface_status"]
 mycol = mydb["routers"]
+myconf = mydb["config_int"]
 print(f"MONGO_URL {mongo_url}")
 print(f"MONGO_DB {mongo_db}")
 
@@ -30,10 +31,13 @@ def main():
 
 
 @app.route("/router/<ip>")
-def check_status(ip):
+def router_details(ip):
     data = myint.find({"router_ip": ip})
-    lastest_data = list(data.sort("timestamp", -1).limit(5))
-    return render_template("router_detail.html", ip=ip, data=lastest_data)
+    lastest_data = list(data.sort("timestamp", -1).limit(1))
+    router_list = []
+    for x in mycol.find():
+        router_list.append(x)
+    return render_template("router_detail.html", ip=ip, data=lastest_data, router_list=router_list)
 
 
 @app.route("/add", methods=["POST"])
@@ -47,11 +51,29 @@ def add_router():
 
 
 @app.route("/delete/<idx>", methods=["POST"])
-def delete_comment(idx):
+def delete_router(idx):
     try:
         mycol.delete_one({"_id": ObjectId(idx)})
     except Exception:
         pass
+    return redirect(url_for("main"))
+
+@app.route("/config/<ip>", methods=["POST"])
+def config_interface(ip):
+    interface_list = []
+    idx = 0
+    while True:
+        if not request.form.get(f"interface {idx}"):
+            break
+        interface_list.append({
+            "interface" : request.form.get(f"interface {idx}"), 
+            "ip" : request.form.get(f"ip {idx}"), 
+            "subnet" : request.form.get(f"subnet {idx}"),
+            "status" : request.form.get(f"status {idx}"),
+            "description" : request.form.get(f"description {idx}")
+        })
+        idx += 1
+    print(interface_list)
     return redirect(url_for("main"))
 
 
