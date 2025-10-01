@@ -105,9 +105,14 @@
 
                                             <!-- Status Dropdown (เหลือแค่ UP/DOWN) - แก้ไขเป็น loop.parent.index0 และ loop.index0 -->
                                             <td>
-						    <select class="editable-select" name="status {{ interfaces.index }}">
-                                                    <option value="UP" {% if interfaces.status == "UP" %}selected{% endif %}>UP</option>
-                                                    <option value="DOWN" {% if interfaces.status == "DOWN" %}selected{% endif %}>DOWN</option>
+						<select class="editable-select" name="status {{ interfaces.index }}">
+						    {% if interfaces.status == "up" %}
+                                                    	<option value="up" selected>up</option>
+                                                    	<option value="down">down</option>
+						    {% else %}
+                                                    	<option value="up">up</option>
+                                                    	<option value="down"selected>down</option>
+						    {% endif %}
                                                 </select>
                                             </td>
 

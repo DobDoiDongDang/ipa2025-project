@@ -1,12 +1,14 @@
 from pymongo import MongoClient
 import datetime
 import os
+from bson import ObjectId
 
 mongo_url = os.environ.get("MONGO_URI")
 mongo_db = os.environ.get("DB_NAME")
 client = MongoClient(mongo_url)
 mydb = client[mongo_db]
 mycol = mydb["interface_status"]
+myconf = mydb["config_int"]
 
 
 def save_interface(router_ip, data):
@@ -17,3 +19,5 @@ def save_interface(router_ip, data):
             "interfaces": data,
         }
     )
+def save_config(idx):
+    myconf.update_one({"_id":ObjectId(idx)}, {"$set": {"status" : "yah"}})

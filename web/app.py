@@ -37,7 +37,9 @@ def router_details(ip):
     router_list = []
     for x in mycol.find():
         router_list.append(x)
-    return render_template("router_detail.html", ip=ip, data=lastest_data, router_list=router_list)
+    return render_template(
+        "router_detail.html", ip=ip, data=lastest_data, router_list=router_list
+    )
 
 
 @app.route("/add", methods=["POST"])
@@ -58,23 +60,37 @@ def delete_router(idx):
         pass
     return redirect(url_for("main"))
 
+
 @app.route("/config/<ip>", methods=["POST"])
 def config_interface(ip):
     interface_list = []
-    idx = 0
-    while True:
-        if not request.form.get(f"interface {idx}"):
-            break
-        interface_list.append({
-            "interface" : request.form.get(f"interface {idx}"), 
-            "ip" : request.form.get(f"ip {idx}"), 
-            "subnet" : request.form.get(f"subnet {idx}"),
-            "status" : request.form.get(f"status {idx}"),
-            "description" : request.form.get(f"description {idx}")
-        })
-        idx += 1
-    print(interface_list)
-    return redirect(url_for("main"))
+    config_list = []
+    data = myint.find({"router_ip": ip})
+    lastest_data = list(data.sort("timestamp", -1).limit(1))   
+    for i in lastest_data[0]["interfaces"]:
+        idx = i["index"]
+        changed = False
+        if i["ip_address"] != request.form.get(f"ip {idx}"):
+            changed = True
+        if i["subnet"] != request.form.get(f"subnet {idx}"):
+            changed = True
+        if (i["status"]) != request.form.get(f"status {idx}"):
+            changed = True
+        if i["description"] != request.form.get(f"description {idx}"):
+            changed = True
+        if changed:
+            interface_list.append(
+                {
+                    "interface": request.form.get(f"interface {idx}"),
+                    "ip": request.form.get(f"ip {idx}"),
+                    "subnet": request.form.get(f"subnet {idx}"),
+                    "status": request.form.get(f"status {idx}"),
+                    "description": request.form.get(f"description {idx}"),
+                }
+            )
+    if interface_list:
+        myconf.insert_one({"ip": ip, "status": "nah", "data": interface_list})
+    return redirect(url_for(f"router_details", ip=ip))
 
 
 if __name__ == "__main__":

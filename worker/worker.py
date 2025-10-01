@@ -3,6 +3,7 @@ import json
 import os
 import time
 from get_router_data import get_int_data
+from config_router_interface import config_router_interface
 from save_data import save_interface
 
 RABBITMQ_HOST = os.environ.get("RABBITMQ_HOST")
@@ -13,12 +14,17 @@ pwd = os.getenv("RABBITMQ_DEFAULT_PASS")
 
 def callback(ch, method, properties, body):
     print("Got it queue :", body.decode())
-    message_data = json.loads(body.decode())
-    ip = message_data.get("ip")
-    username = message_data.get("username")
-    password = message_data.get("password")
-    int_data = get_int_data(ip, username, password)
-    save_interface(ip, int_data)
+    if str(method.routing_key) == "config_interfaces":
+        message_data = json.loads(body.decode())
+        ip = message_data.get("ip")
+        config_router_interface(ip, message_data.get("data"), message_data.get("_id"))
+    else:
+        message_data = json.loads(body.decode())
+        ip = message_data.get("ip")
+        username = message_data.get("username")
+        password = message_data.get("password")
+        int_data = get_int_data(ip, username, password)
+        save_interface(ip, int_data)
     print("Done (;")
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
@@ -42,7 +48,7 @@ def listening():
 
 
 if __name__ == "__main__":
-    INTERVAL = 60.0
+    INTERVAL = 15.0
     next_run = time.monotonic()
     count = 0
 
