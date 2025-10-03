@@ -157,8 +157,19 @@ body {
     font-weight: 500;
 }
 
+.delete-button {
+    color: white;
+    font-style: italic;
+    background-color: red;
+    border-radius: 6px;
+    padding: 0.5rem;
+    display: block;
+    text-align: center;
+    font-weight: 500;	
+}
+
 /* Button Styles */
-.save-button, .back-button {
+.save-button, .back-button , .cancle-button{
     display: block;
     padding: 0.75rem 1.5rem;
     border-radius: 9999px; 
@@ -170,15 +181,50 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.cancle-button {
+    background-color: red;
+    color: white;
+    margin-top: 1.5rem;
+}
+
 .save-button {
     background-color: #8ce196; 
     color: #1f2937;
     margin-top: 1.5rem;
 }
 
-.save-button:hover {
-    background-color: #6ac974;
+.save-button:hover, .cancle-button:hover {
+    background-color: white;
+    color: black;
     transform: translateY(-2px);
     box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Popup Overlay */
+.popup-overlay {
+    display: none; /* ซ่อนก่อน */
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Popup Box */
+.popup-content {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    animation: fadeIn 0.3s ease;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 

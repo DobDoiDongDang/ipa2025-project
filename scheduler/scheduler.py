@@ -4,7 +4,7 @@ from bson import json_util
 from producer import produce
 from producer import produce_interface_config
 from database import get_router_info
-from database import get_router_interface_config
+from database import get_router_config
 
 
 def scheduler():
@@ -19,9 +19,9 @@ def scheduler():
         now_str_with_ms = f"{now_str}.{ms:03d}"
         print(f"[{now_str_with_ms}] run #{count}")
         try:
-            for config in get_router_interface_config():
+            for config in get_router_config():
                 body = json_util.dumps(config).encode("utf-8")
-                produce_interface_config("localhost", body)
+                produce_interface_config("localhost", body, config.get("task"))
             for data in get_router_info():
                 body_bytes = json_util.dumps(data).encode("utf-8")
                 produce("localhost", body_bytes)

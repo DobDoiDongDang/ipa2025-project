@@ -18,7 +18,7 @@ def produce(host, body):
     channel.basic_publish(exchange="jobs", routing_key="check_interfaces", body=body)
     connection.close()
 
-def produce_interface_config(host, body):
+def produce_interface_config(host, body, task):
     connection = pika.BlockingConnection(
         pika.ConnectionParameters(host, credentials=creds)
     )
@@ -26,9 +26,9 @@ def produce_interface_config(host, body):
     channel.exchange_declare(exchange="jobs", exchange_type="direct")
     channel.queue_declare(queue="router_jobs")
     channel.queue_bind(
-        queue="router_jobs", exchange="jobs", routing_key="config_interfaces"
+        queue="router_jobs", exchange="jobs", routing_key=task
     )
-    channel.basic_publish(exchange="jobs", routing_key="config_interfaces", body=body)
+    channel.basic_publish(exchange="jobs", routing_key=task, body=body)
     connection.close()
 
 if __name__ == "__main__":

@@ -7,7 +7,7 @@ from save_data import save_config
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-def config_router_interface(router_ip, data, database_id):
+def add_interface(router_ip, data, database_id):
     router_data = get_data(router_ip)
     username = router_data["username"]
     password = router_data["password"]
@@ -38,23 +38,7 @@ def config_router_interface(router_ip, data, database_id):
                         }]
                 }}
                 }
-        else:
-            payload = {
-                "ietf-interfaces:interface": {
-                    "name": f"{intf}",
-                    "description": f"{description}",
-                    "type": "iana-if-type:ethernetCsmacd",
-                    "enabled": status,
-                    "ietf-ip:ipv4": {
-                        "address": [{
-                            "ip": f"{ip}",
-                            "netmask": f"{subnet}"
-                        }]
-                }}  
-                }
-        print(payload)
         url = f"https://{router_ip}/restconf/data/ietf-interfaces:interfaces/interface={intf}"
-        print(url)
         response = requests.put(
             url,
             data=json.dumps(payload),

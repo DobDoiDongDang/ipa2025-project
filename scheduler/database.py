@@ -8,11 +8,11 @@ def get_router_info():
     routers = db["routers"]
     router_data = routers.find()
     return router_data
-def get_router_interface_config():
-    config = db["config_int"]
+
+def get_router_config():
+    config = db["config"]
     config_data = config.find({ "status" : "nah" })
-    return config_data
-    
+    return config_data    
 
 if __name__ == "__main__":
     get_router_info()
