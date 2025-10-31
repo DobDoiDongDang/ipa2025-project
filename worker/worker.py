@@ -2,8 +2,9 @@ import pika
 import json
 import os
 import time
-from get_router_data import get_int_data
+from get_router_data import get_int_data, get_routing_data
 from config_router_interface import config_router_interface
+from config_loopback import add_loopback_interface, delete_loopback_interface
 from save_data import save_interface
 
 RABBITMQ_HOST = os.environ.get("RABBITMQ_HOST")
@@ -14,17 +15,27 @@ pwd = os.getenv("RABBITMQ_DEFAULT_PASS")
 
 def callback(ch, method, properties, body):
     print("Got it queue :", body.decode())
-    if str(method.routing_key) == "config_interfaces":
+    routing_key = str(method.routing_key)
+    if routing_key == "config_interfaces":
         message_data = json.loads(body.decode())
         ip = message_data.get("ip")
         config_router_interface(ip, message_data.get("data"), message_data.get("_id"))
+    elif routing_key == "del_loopback":
+        message_data = json.loads(body.decode())
+        ip = message_data.get("ip")
+        delete_loopback_interface(ip, message_data.get("data"), message_data.get("_id"))
+    elif routing_key == "add_loopback":
+        message_data = json.loads(body.decode())
+        ip = message_data.get("ip")
+        add_loopback_interface(ip, message_data.get("data"), message_data.get("_id"))
     else:
         message_data = json.loads(body.decode())
         ip = message_data.get("ip")
         username = message_data.get("username")
         password = message_data.get("password")
         int_data = get_int_data(ip, username, password)
-        save_interface(ip, int_data)
+        routing_data = get_routing_data(ip, username, password)
+        save_interface(ip, int_data, routing_data)
     print("Done (;")
     ch.basic_ack(delivery_tag=method.delivery_tag)
 

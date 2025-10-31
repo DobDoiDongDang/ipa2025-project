@@ -1,20 +1,37 @@
 <!DOCTYPE html>
+
 <html lang="th">
 
+
+
 <head>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Router: {{ ip }}</title>
+
     <!-- โหลด Tailwind CSS สำหรับ Utility Class -->
+
     <script src="https://cdn.tailwindcss.com"></script>
+
     <!-- เชื่อมโยงไปยังไฟล์ Custom Stylesheet -->
-    <link rel="stylesheet" href="/static/router_details.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
-</head>
+
+    <!DOCTYPE html>
+    <html lang="th">
+
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Router: {{ ip }}</title>
+        <!-- โหลด Tailwind CSS สำหรับ Utility Class -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <!-- เชื่อมโยงไปยังไฟล์ Custom Stylesheet -->
+        <link rel="stylesheet" href="/static/router_details.css" />
+        <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+    </head>
 
 <body>
     <!-- CONTAINER FOR TWO-COLUMN LAYOUT -->
     <div class="main-layout">
-
         <!-- START: LEFT SIDEBAR (รายการ Router ทั้งหมด) -->
         <aside class="sidebar">
             <header>
@@ -37,17 +54,16 @@
             </a>
         </aside>
         <!-- END: LEFT SIDEBAR -->
-
         <!-- START: MAIN CONTENT AREA -->
         <main class="main-content">
             <div class="p-6">
                 <!-- ส่วนหัวข้อ -->
                 <div class="header-section flex justify-between items-center pb-4 mb-8 border-b-4 border-teal-400">
                     <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">รายละเอียด Router: <span
-			class="text-teal-500">{{ ip }} </span></h1>
-		    <h1 class="text-3xl sm:text-4xl font-bold text-gray-800"><span class="text-teal-500">{{ timestamp }}</span></h1>
+                            class="text-teal-500">{{ ip }} </span></h1>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-gray-800"><span class="text-teal-500">{{ timestamp
+                            }}</span></h1>
                 </div>
-
                 <!-- ฟอร์มสำหรับส่งข้อมูลการแก้ไข -->
                 <div class="table-wrapper shadow-xl rounded-xl overflow-hidden">
                     <table class="data-table">
@@ -64,11 +80,12 @@
                         </thead>
                         <tbody>
                             <form method="POST" action="/config/{{ ip }}">
-                            {% for interfaces in interface %}
+                                {% for interfaces in interface %}
                                 <tr class="hover:bg-cyan-50 transition duration-150">
                                     {% if "Loopback" in interfaces.interface %}
                                     <td>
-					    <button type="button" onclick="delete_loopback('{{ interfaces.interface }}')" class="delete-button">Delete</button>
+                                        <button type="button" onclick="delete_loopback('{{ interfaces.interface }}')"
+                                            class="delete-button">Delete</button>
                                     </td>
                                     {% else %}
                                     <td><span class="readonly-cell">Delete</span></td>
@@ -79,7 +96,6 @@
                                             value="{{ interfaces.interface }}">
                                         {{ interfaces.interface }}
                                     </td>
-
                                     <!-- IP Address (แก้ไขได้ตามเงื่อนไข: เป็น Text Box) -->
                                     <td>
                                         {% if interfaces.ip_address == ip %}
@@ -93,7 +109,6 @@
                                             value="{{ interfaces.ip_address }}" required class="editable-input">
                                         {% endif %}
                                     </td>
-
                                     <!-- Subnet Mask (แก้ไขได้: เป็น Text Box) - แก้ไขเป็น loop.parent.index0 และ loop.index0 -->
                                     <td>
                                         {% if interfaces.ip_address == ip %}
@@ -106,12 +121,10 @@
                                             class="editable-input">
                                         {% endif %}
                                     </td>
-
                                     <!-- MAC Address (แสดงผลอย่างเดียว) -->
                                     <td class="text-sm text-gray-600 font-mono">
                                         {{ interfaces.mac_address }}
                                     </td>
-
                                     <!-- Status Dropdown (เหลือแค่ UP/DOWN) - แก้ไขเป็น loop.parent.index0 และ loop.index0 -->
                                     <td>
                                         {% if interfaces.ip_address == ip %}
@@ -130,14 +143,52 @@
                                         </select>
                                         {% endif %}
                                     </td>
-
                                     <!-- Description (แก้ไขได้: เป็น Text Box) - แก้ไขเป็น loop.parent.index0 และ loop.index0 -->
                                     <td>
                                         <input type="text" name="description {{ interfaces.index }}"
                                             value="{{ interfaces.description if interfaces.description else '' }}"
                                             class="editable-input text-xs" placeholder="เพิ่มคำอธิบาย">
                                     </td>
-
+                                </tr>
+                                {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mt-10 mb-4">ตาราง Routing</h2>
+                <div class="table-wrapper shadow-xl rounded-xl overflow-hidden">
+                    <table class="data-table data-table--small">
+                        <thead>
+                            <tr>
+                                <th>Destination</th>
+                                <th>Gateway</th>
+                                <th>AD</th>
+                                <th>Metric</th>
+                                <th>Next Hop</th>
+                                <th>Interface</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <form method="POST" action="/config/{{ ip }}">
+                                {% for route in routing_table %}
+                                <tr class="hover:bg-cyan-50 transition duration-150">
+                                    <td>
+                                        <span class="readonly-cell">{{ route.prefix }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="readonly-cell">{{ route.protocol }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="readonly-cell">{{ route.ad }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="readonly-cell">{{ route.metric }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="readonly-cell">{{ route.next_hop }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="readonly-cell">{{ route.interface }}</span>
+                                    </td>
                                 </tr>
                                 {% endfor %}
                         </tbody>
@@ -150,7 +201,6 @@
                     บันทึกการเปลี่ยนแปลง
                 </button>
                 </form>
-
                 <!-- Popup Overlay -->
                 <div id="popup" class="popup-overlay">
                     <div class="popup-content">
@@ -164,21 +214,19 @@
                                 {% endfor %}
                             </select>
                             <label class="block mb-2 font-semibold">IP Address:</label>
-                            <input type="text" name="ip_address" placeholder="เช่น 10.0.0.1" required
+                            <input type="text" name="ip" placeholder="เช่น 10.0.0.1" required
                                 class="editable-input mb-4">
-
                             <label class="block mb-2 font-semibold">Subnet Mask:</label>
                             <input type="text" name="subnet" placeholder="เช่น 255.255.255.0" required
                                 class="editable-input mb-4">
-			    <label class="block mb-2 font-semibold">Description:</label>
-                            <input type="text" name="description"
-                                               class="editable-input text-xs" placeholder="เพิ่มคำอธิบาย">
-
+                            <label class="block mb-2 font-semibold">Description:</label>
+                            <input type="text" name="description" class="editable-input text-xs"
+                                placeholder="เพิ่มคำอธิบาย">
                             <label class="block mb-2 font-semibold">Status:</label>
-			    <select class="editable-select" name="status">
-                            	<option value="up" selected>up</option>
-                            	<option value="down">down</option>
-			    </select>
+                            <select class="editable-select" name="status">
+                                <option value="up" selected>up</option>
+                                <option value="down">down</option>
+                            </select>
                             <div class="flex justify-end space-x-3 mt-4">
                                 <button type="button" onclick="closePopup()" class="cancle-button px-6">ยกเลิก</button>
                                 <button type="submit" onclick="closePopup()" class="save-button px-6">บันทึก</button>
@@ -186,11 +234,8 @@
                         </form>
                     </div>
                 </div>
-
-
             </div>
         </main>
-        <!-- END: MAIN CONTENT AREA -->
     </div>
     <script>
         function openPopup() {
@@ -199,16 +244,16 @@
         function closePopup() {
             document.getElementById("popup").style.display = "none";
         }
-	function delete_loopback(lb){
-		data = { interface : lb}
-		fetch("/del_loopback/{{ ip }}", {
-        	method: "POST",
-        	headers: {
-            	"Content-Type": "application/json"
-        	},
-        		body: JSON.stringify(data)
-    		})
-	}
+        function delete_loopback(lb) {
+            data = { interface: lb }
+            fetch("/del_loopback/{{ ip }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+        }
     </script>
 
 </body>

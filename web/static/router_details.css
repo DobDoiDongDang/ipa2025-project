@@ -228,3 +228,17 @@ body {
     to { transform: scale(1); opacity: 1; }
 }
 
+/* Compact table variant for lower routing table */
+.data-table--small {
+    font-size: 0.9rem;
+    min-width: 500px;
+}
+
+.data-table--small th,
+.data-table--small td {
+    padding: 0.5rem 0.75rem;
+}
+
+.data-table--small th {
+    font-size: 0.75rem;
+}

@@ -9,4 +9,4 @@ mycol = mydb["routers"]
 
 
 def get_data(router_ip):
-    return mycol.find_one({"ip":router_ip})
+    return mycol.find_one({"ip": router_ip})

@@ -37,18 +37,26 @@ def router_details(ip):
         {
             "router_ip": ip,
         },
-        sort=[("created_at", pymongo.DESCENDING)],
+        sort=[("timestamp", pymongo.DESCENDING)],
     )
     router_list = []
     for x in mycol.find():
         router_list.append(x)
-    return render_template(
-        "router_detail.html",
-        ip=ip,
-        router_list=router_list,
-        timestamp=data.get("timestamp").split(".")[0],
-        interface=data.get("interfaces"),
-    )
+    if data:
+        return render_template(
+            "router_detail.html",
+            ip=ip,
+            router_list=router_list,
+            timestamp=data.get("timestamp").split(".")[0],
+            interface=data.get("interfaces"),
+            routing_table=data.get("routing")
+        )
+    else:
+        return render_template(
+            "router_detail.html", 
+            ip=ip,
+            router_list=router_list,
+            routing_table=[])
 
 
 @app.route("/add", methods=["POST"])
@@ -103,27 +111,45 @@ def config_interface(ip):
                 }
             )
     if interface_list:
-        myconf.insert_one({"ip": ip, "task": "config_interfaces", "status": "nah", "data": interface_list})
+        myconf.insert_one(
+            {
+                "ip": ip,
+                "task": "config_interfaces",
+                "status": "nah",
+                "data": interface_list,
+            }
+        )
     return redirect(url_for(f"router_details", ip=ip))
 
 
 @app.route("/add_loopback/<ip>", methods=["POST"])
 def add_loopback(ip):
     interface = {
-            "interface": request.form.get(f"interface"), 
-            "ip": request.form.get(f"ip"),
-            "subnet": request.form.get(f"subnet"),
-            "status": request.form.get(f"status"),
-            "description": request.form.get(f"description"),
-            }
-    myconf.insert_one({"ip": ip, "task": "add_loopback", "status": "nah", "data": interface})
+        "interface": request.form.get(f"interface"),
+        "ip": request.form.get(f"ip"),
+        "subnet": request.form.get(f"subnet"),
+        "status": request.form.get(f"status"),
+        "description": request.form.get(f"description"),
+    }
+    myconf.insert_one(
+        {"ip": ip, "task": "add_loopback", "status": "nah", "data": interface}
+    )
     return redirect(url_for("router_details", ip=ip))
+
 
 @app.route("/del_loopback/<ip>", methods=["POST"])
 def del_loopback(ip):
     data = request.get_json()
-    myconf.insert_one({"ip": ip, "task": "del_loopback", "status": "nah", "data":{"interface": data["interface"]}})
+    myconf.insert_one(
+        {
+            "ip": ip,
+            "task": "del_loopback",
+            "status": "nah",
+            "data": {"interface": data["interface"]},
+        }
+    )
     return redirect(url_for("router_details", ip=ip))
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)

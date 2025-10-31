@@ -21,7 +21,7 @@ def config_router_interface(router_ip, data, database_id):
         subnet = interface["subnet"]
         description = interface["description"]
         if interface["status"] == "up":
-           status = True
+            status = True
         else:
             status = False
         if "Loopback" in intf:
@@ -32,12 +32,10 @@ def config_router_interface(router_ip, data, database_id):
                     "type": "iana-if-type:softwareLoopback",
                     "enabled": status,
                     "ietf-ip:ipv4": {
-                        "address": [{
-                            "ip": f"{ip}",
-                            "netmask": f"{subnet}"
-                        }]
-                }}
+                        "address": [{"ip": f"{ip}", "netmask": f"{subnet}"}]
+                    },
                 }
+            }
         else:
             payload = {
                 "ietf-interfaces:interface": {
@@ -46,12 +44,10 @@ def config_router_interface(router_ip, data, database_id):
                     "type": "iana-if-type:ethernetCsmacd",
                     "enabled": status,
                     "ietf-ip:ipv4": {
-                        "address": [{
-                            "ip": f"{ip}",
-                            "netmask": f"{subnet}"
-                        }]
-                }}  
+                        "address": [{"ip": f"{ip}", "netmask": f"{subnet}"}]
+                    },
                 }
+            }
         print(payload)
         url = f"https://{router_ip}/restconf/data/ietf-interfaces:interfaces/interface={intf}"
         print(url)
@@ -60,12 +56,8 @@ def config_router_interface(router_ip, data, database_id):
             data=json.dumps(payload),
             auth=(username, password),
             headers=headers,
-            verify=False
+            verify=False,
         )
         response.raise_for_status()
         print(f"Status Code: {response.status_code}")
     save_config(database_id["$oid"])
-
-
-#def config_ip_loopback(ip, username, password, new_ip):
-
