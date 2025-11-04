@@ -41,21 +41,34 @@ def callback(ch, method, properties, body):
 
 
 def listening():
-    try:
-        creds = pika.PlainCredentials(user, pwd)
-        connect = pika.BlockingConnection(
-            pika.ConnectionParameters(RABBITMQ_HOST, credentials=creds)
-        )
-        channel = connect.channel()
-        channel.queue_declare(queue=RABBITMQ_QUEUE)
-        print("Connected to rabbitmq waiting for queue")
-        channel.basic_qos(prefetch_count=1)
-        channel.basic_consume(queue=RABBITMQ_QUEUE, on_message_callback=callback)
-        channel.start_consuming()
-    except pika.exceptions.AMQPConnectionError as e:
-        print(f"Can't connect to Rabbitmq: {e}")
-    except Exception as e:
-        print(f"Error {e}")
+    while True:
+        try:
+            creds = pika.PlainCredentials(user, pwd)
+            connect = pika.BlockingConnection(
+                pika.ConnectionParameters(
+                    RABBITMQ_HOST,
+                    credentials=creds,
+                    heartbeat=600,
+                    blocked_connection_timeout=300
+                )
+            )
+            channel = connect.channel()
+            channel.queue_declare(queue=RABBITMQ_QUEUE)
+            print("Connected to rabbitmq waiting for queue")
+            channel.basic_qos(prefetch_count=1)
+            channel.basic_consume(queue=RABBITMQ_QUEUE, on_message_callback=callback)
+            channel.start_consuming()
+        except pika.exceptions.AMQPConnectionError as e:
+            print(f"Can't connect to Rabbitmq: {e}")
+            print("Retrying in 5 seconds...")
+            time.sleep(5)
+        except pika.exceptions.StreamLostError as e:
+            print(f"Stream lost: {e}")
+            print("Retrying in 5 seconds...")
+            time.sleep(5)
+        except Exception as e:
+            print(f"Critical error: {e}")
+            raise  # Re-raise unhandled exceptions
 
 
 if __name__ == "__main__":
