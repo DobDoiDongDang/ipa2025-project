@@ -5,4 +5,4 @@ COPY  ./producer.py .
 COPY  ./scheduler.py .
 COPY  ./database.py .
 RUN pip install --no-cache-dir --progress-bar off -r requirements.txt
-CMD python scheduler.py
+CMD python -u scheduler.py

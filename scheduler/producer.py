@@ -37,4 +37,4 @@ def produce_interface_config(host, body, task):
 
 
 if __name__ == "__main__":
-    produce("localhost", "192.168.100.21")
+    produce("rabbitmq", "192.168.100.21")
