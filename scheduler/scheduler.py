@@ -18,23 +18,16 @@ def scheduler():
         ms = int((now % 1) * 1000)
         now_str_with_ms = f"{now_str}.{ms:03d}"
         print(f"[{now_str_with_ms}] run #{count}")
-        rinfo = get_router_info()
-        print("rinfo:", json_util.dumps(rinfo))
-        print("start")
         try:
-            print("checkpoint1")
-           # for config in get_router_config():
-           #     body = json_util.dumps(config)
-           #     print("checkpoint2")
-           #     produce_interface_config("localhost", body, config.get("task"))
+            for config in get_router_config():
+                body = json_util.dumps(config).encode("utf-8")
+                produce_interface_config("rabbitmq", body, config.get("task"))
             for data in get_router_info():
-                body_bytes = json_util.dumps(data)
-                print("checkpoint3")
-                produce("localhost", body_bytes)
+                body_bytes = json_util.dumps(data).encode("utf-8")
+                produce("rabbitmq", body_bytes)
         except Exception as e:
             print("error",e)
-            print("stre",str(e))
-            print("typee",type(e).__name__)
+            print("type",type(e).__name__)
             time.sleep(3)
         count += 1
         next_run += INTERVAL
