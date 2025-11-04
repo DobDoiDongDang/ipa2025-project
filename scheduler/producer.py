@@ -1,9 +1,12 @@
 import pika
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
 user = os.getenv("RABBITMQ_DEFAULT_USER")
 pwd = os.getenv("RABBITMQ_DEFAULT_PASS")
+print(user, pwd)
 creds = pika.PlainCredentials(user, pwd)
 
 
@@ -34,4 +37,4 @@ def produce_interface_config(host, body, task):
 
 
 if __name__ == "__main__":
-    produce("localhost", "192.168.1.44")
+    produce("localhost", "192.168.100.21")
